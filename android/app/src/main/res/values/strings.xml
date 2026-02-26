@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NDS Emulator</string>
+    
+    <!-- Game Library -->
+    <string name="library_title">Game Library</string>
+    <string name="library_empty">No games found. Add ROMs to get started!</string>
+    <string name="library_search_hint">Search games…</string>
+    <string name="library_refresh">Refresh Library</string>
+    <string name="library_add_rom">Add ROM</string>
+    <string name="library_select_folder">Select Folder</string>
+    
+    <!-- Game Actions -->
+    <string name="game_play">Play</string>
+    <string name="game_info">Game Info</string>
+    <string name="game_delete">Delete</string>
+    <string name="game_delete_confirm">Are you sure you want to delete this game?</string>
+    <string name="game_save_state">Save State</string>
+    <string name="game_load_state">Load State</string>
+    <string name="game_cheats">Cheats</string>
+    <string name="game_update">Update ROM</string>
+    
+    <!-- Download -->
+    <string name="download_title">Download ROM</string>
+    <string name="download_url_hint">Enter ROM URL</string>
+    <string name="download_button">Download</string>
+    <string name="download_progress">Downloading…</string>
+    <string name="download_success">Download complete!</string>
+    <string name="download_error">Download failed</string>
+    
+    <!-- Emulator -->
+    <string name="emulator_title">Playing</string>
+    <string name="emulator_pause">Pause</string>
+    <string name="emulator_resume">Resume</string>
+    <string name="emulator_stop">Stop</string>
+    <string name="emulator_fast_forward">Fast Forward</string>
+    <string name="emulator_save_state">Save State</string>
+    <string name="emulator_load_state">Load State</string>
+    <string name="emulator_settings">Emulator Settings</string>
+    <string name="emulator_controls">Controls</string>
+    <string name="emulator_graphics">Graphics</string>
+    <string name="emulator_audio">Audio</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_general">General</string>
+    <string name="settings_graphics">Graphics</string>
+    <string name="settings_controls">Controls</string>
+    <string name="settings_audio">Audio</string>
+    <string name="settings_advanced">Advanced</string>
+    <string name="settings_about">About</string>
+    
+    <!-- Graphics Settings -->
+    <string name="graphics_renderer">Renderer</string>
+    <string name="graphics_renderer_software">Software</string>
+    <string name="graphics_renderer_gl">OpenGL</string>
+    <string name="graphics_screen_layout">Screen Layout</string>
+    <string name="graphics_screen_vertical">Vertical</string>
+    <string name="graphics_screen_horizontal">Horizontal</string>
+    <string name="graphics_screen_hybrid">Hybrid</string>
+    <string name="graphics_screen_single">Single Screen</string>
+    <string name="graphics_scale">Scale</string>
+    <string name="graphics_rotation">Rotation</string>
+    <string name="graphics_filter">Filter</string>
+    <string name="graphics_filter_none">None</string>
+    <string name="graphics_filter_smooth">Smooth</string>
+    
+    <!-- Control Settings -->
+    <string name="controls_touch">Touch Controls</string>
+    <string name="controls_show_buttons">Show Touch Buttons</string>
+    <string name="controls_button_size">Button Size</string>
+    <string name="controls_button_opacity">Button Opacity</string>
+    <string name="controls_haptic">Haptic Feedback</string>
+    <string name="controls_gyro">Gyroscope Control</string>
+    <string name="controls_configure_buttons">Configure Buttons</string>
+    
+    <!-- Audio Settings -->
+    <string name="audio_enabled">Enable Audio</string>
+    <string name="audio_volume">Volume</string>
+    <string name="audio_microphone">Microphone</string>
+    <string name="audio_microphone_enabled">Enable Microphone</string>
+    
+    <!-- Emulation Settings -->
+    <string name="emulation_dsi_mode">DSi Mode</string>
+    <string name="emulation_wifi">WiFi Simulation</string>
+    <string name="emulation_saves">Saves</string>
+    <string name="emulation_saves_auto">Auto Save</string>
+    <string name="emulation_frameskip">Frameskip</string>
+    <string name="emulation_cpu_mode">CPU Mode</string>
+    <string name="emulation_cpu_jit">JIT (Fast)</string>
+    <string name="emulation_cpu_interpreter">Interpreter (Accurate)</string>
+    
+    <!-- Cheats -->
+    <string name="cheats_title">Cheats</string>
+    <string name="cheats_enable">Enable Cheats</string>
+    <string name="cheats_add">Add Cheat</string>
+    <string name="cheats_search">Search Cheats</string>
+    <string name="cheats_name">Cheat Name</string>
+    <string name="cheats_code">Cheat Code</string>
+    <string name="cheats_no_cheats">No cheats available for this game</string>
+    
+    <!-- Save States -->
+    <string name="save_states_title">Save States</string>
+    <string name="save_states_slots">Save Slots</string>
+    <string name="save_states_slot">Slot %1$d</string>
+    <string name="save_states_empty">Empty</string>
+    <string name="save_states_saved">Saved: %1$s</string>
+    <string name="save_states_confirm_load">Load this save state? Current progress will be lost.</string>
+    <string name="save_states_confirm_overwrite">Overwrite this save state?</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">An error occurred</string>
+    <string name="error_rom_not_found">ROM file not found</string>
+    <string name="error_rom_corrupted">ROM file is corrupted</string>
+    <string name="error_save_failed">Failed to save</string>
+    <string name="error_load_failed">Failed to load</string>
+    <string name="error_permission_denied">Storage permission denied</string>
+    <string name="error_decompression_failed">Failed to decompress file</string>
+    
+    <!-- Dialogs -->
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_no">No</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_delete">Delete</string>
+    <string name="dialog_save">Save</string>
+    <string name="dialog_close">Close</string>
+    
+    <!-- Notifications -->
+    <string name="notification_channel_emulation">Emulation</string>
+    <string name="notification_emulation_running">Game is running</string>
+</resources>
