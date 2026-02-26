@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ndsemulator.app.domain.model.Game
 import com.ndsemulator.app.domain.repository.GameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +20,7 @@ import javax.inject.Inject
 /**
  * ViewModel for the Library screen.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
     private val gameRepository: GameRepository
@@ -91,6 +93,17 @@ class LibraryViewModel @Inject constructor(
     fun toggleFavorite(game: Game) {
         viewModelScope.launch {
             gameRepository.updateGame(game.copy(isFavorite = !game.isFavorite))
+        }
+    }
+    
+    fun importGame(filePath: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                gameRepository.importRom(filePath)
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 }

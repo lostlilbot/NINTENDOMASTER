@@ -103,7 +103,17 @@ class GameRepositoryImpl @Inject constructor(
         val file = File(filePath)
         if (!file.exists()) return@withContext null
         
-        createGameFromFile(file)
+        val game = createGameFromFile(file) ?: return@withContext null
+        
+        // Check if game already exists
+        val existingGame = gameDao.getGameByPath(file.absolutePath)
+        if (existingGame != null) {
+            return@withContext existingGame.toDomain()
+        }
+        
+        // Save to database
+        val id = gameDao.insertGame(GameEntity.fromDomain(game))
+        game.copy(id = id)
     }
     
     private fun createGameFromFile(file: File): Game? {

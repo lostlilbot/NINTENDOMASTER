@@ -1,5 +1,8 @@
 package com.ndsemulator.app.ui.screens.library
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,10 +51,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ndsemulator.app.domain.model.Game
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -70,6 +75,46 @@ fun LibraryScreen(
     val games by viewModel.games.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     var isSearchActive by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    
+    // File picker launcher
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            // Take persistent permission
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: SecurityException) {
+                // Permission may not be grantable for all URIs
+            }
+            
+            // Copy file to app's internal storage
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val fileName = uri.lastPathSegment ?: "game.nds"
+                val gamesDir = File(context.filesDir, "games")
+                if (!gamesDir.exists()) {
+                    gamesDir.mkdirs()
+                }
+                val destFile = File(gamesDir, fileName)
+                
+                inputStream?.use { input ->
+                    destFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                
+                // Import the game
+                viewModel.importGame(destFile.absolutePath)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
     
     Scaffold(
         topBar = {
@@ -116,7 +161,17 @@ fun LibraryScreen(
                     Icon(Icons.Default.Download, contentDescription = "Download ROM")
                 }
                 FloatingActionButton(
-                    onClick = { viewModel.scanForGames() },
+                    onClick = {
+                        // Open file picker for ROM files
+                        filePickerLauncher.launch(arrayOf(
+                            "application/x-nds",
+                            "application/zip",
+                            "application/x-zip-compressed",
+                            "application/x-7z-compressed",
+                            "application/octet-stream",
+                            "*/*"
+                        ))
+                    },
                     containerColor = MaterialTheme.colorScheme.tertiary
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add ROM")
@@ -145,10 +200,7 @@ fun LibraryScreen(
             }
             
             if (games.isEmpty()) {
-                EmptyLibraryMessage(
-                    onAddClick = { viewModel.scanForGames() },
-                    onDownloadClick = onDownloadClick
-                )
+                EmptyLibraryMessage()
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
@@ -169,10 +221,7 @@ fun LibraryScreen(
 }
 
 @Composable
-private fun EmptyLibraryMessage(
-    onAddClick: () -> Unit,
-    onDownloadClick: () -> Unit
-) {
+private fun EmptyLibraryMessage() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
