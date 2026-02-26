@@ -40,10 +40,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,8 +79,10 @@ fun LibraryScreen(
 ) {
     val games by viewModel.games.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val error by viewModel.error.collectAsState()
     var isSearchActive by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
     
     // File picker launcher
     val filePickerLauncher = rememberLauncherForActivityResult(
@@ -90,33 +97,64 @@ fun LibraryScreen(
                 )
             } catch (e: SecurityException) {
                 // Permission may not be grantable for all URIs
+                android.util.Log.w("LibraryScreen", "Could not take persistable permission: ${e.message}")
             }
             
             // Copy file to app's internal storage
             try {
                 val inputStream = context.contentResolver.openInputStream(uri)
-                val fileName = uri.lastPathSegment ?: "game.nds"
+                if (inputStream == null) {
+                    android.util.Log.e("LibraryScreen", "Could not open input stream for URI: $uri")
+                    return@let
+                }
+                
+                // Get a proper filename with extension
+                var fileName = uri.lastPathSegment ?: "game_${System.currentTimeMillis()}.nds"
+                // Ensure the file has a valid extension
+                if (!fileName.contains(".")) {
+                    fileName = "$fileName.nds"
+                }
+                
                 val gamesDir = File(context.filesDir, "games")
                 if (!gamesDir.exists()) {
                     gamesDir.mkdirs()
                 }
                 val destFile = File(gamesDir, fileName)
                 
-                inputStream?.use { input ->
+                android.util.Log.d("LibraryScreen", "Copying file to: ${destFile.absolutePath}")
+                
+                inputStream.use { input ->
                     destFile.outputStream().use { output ->
                         input.copyTo(output)
                     }
                 }
                 
-                // Import the game
-                viewModel.importGame(destFile.absolutePath)
+                // Verify file was copied
+                if (destFile.exists() && destFile.length() > 0) {
+                    android.util.Log.i("LibraryScreen", "File copied successfully: ${destFile.absolutePath}, size: ${destFile.length()}")
+                    // Import the game
+                    viewModel.importGame(destFile.absolutePath)
+                } else {
+                    android.util.Log.e("LibraryScreen", "File copy failed or file is empty")
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
+                android.util.Log.e("LibraryScreen", "Error importing file: ${e.message}", e)
             }
         }
     }
     
+    // Show error snackbar when error occurs
+    LaunchedEffect(error) {
+        error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+    
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = { Text("Game Library") },

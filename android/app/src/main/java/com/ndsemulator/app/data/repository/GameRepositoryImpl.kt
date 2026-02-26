@@ -101,18 +101,27 @@ class GameRepositoryImpl @Inject constructor(
     
     override suspend fun importRom(filePath: String): Game? = withContext(Dispatchers.IO) {
         val file = File(filePath)
-        if (!file.exists()) return@withContext null
+        if (!file.exists()) {
+            android.util.Log.e("GameRepository", "File does not exist: $filePath")
+            return@withContext null
+        }
         
-        val game = createGameFromFile(file) ?: return@withContext null
+        val game = createGameFromFile(file)
+        if (game == null) {
+            android.util.Log.e("GameRepository", "Failed to create game from file: $filePath, extension: ${file.extension}")
+            return@withContext null
+        }
         
         // Check if game already exists
         val existingGame = gameDao.getGameByPath(file.absolutePath)
         if (existingGame != null) {
+            android.util.Log.i("GameRepository", "Game already exists: ${file.absolutePath}")
             return@withContext existingGame.toDomain()
         }
         
         // Save to database
         val id = gameDao.insertGame(GameEntity.fromDomain(game))
+        android.util.Log.i("GameRepository", "Game imported successfully: ${game.title}, id: $id")
         game.copy(id = id)
     }
     
@@ -124,13 +133,19 @@ class GameRepositoryImpl @Inject constructor(
             "nds" -> GameFileType.NDS
             "zip" -> GameFileType.ZIP
             "7z" -> GameFileType.SEVEN_ZIP
-            else -> return null
+            "rar" -> GameFileType.ZIP  // Treat RAR as ZIP archive
+            else -> {
+                android.util.Log.w("GameRepository", "Unsupported file extension: $extension for file: $fileName")
+                return null
+            }
         }
         
         val title = fileName
             .substringBeforeLast(".")
             .replace("_", " ")
             .replace("-", " ")
+        
+        android.util.Log.d("GameRepository", "Creating game: title=$title, path=${file.absolutePath}, size=${file.length()}, type=$fileType")
         
         return Game(
             title = title,

@@ -32,6 +32,9 @@ class LibraryViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+    
     val games: StateFlow<List<Game>> = _searchQuery
         .flatMapLatest { query ->
             if (query.isBlank()) {
@@ -100,10 +103,19 @@ class LibraryViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                gameRepository.importRom(filePath)
+                val result = gameRepository.importRom(filePath)
+                if (result == null) {
+                    _error.value = "Failed to import game. Check file format."
+                }
+            } catch (e: Exception) {
+                _error.value = "Error importing game: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+    
+    fun clearError() {
+        _error.value = null
     }
 }
